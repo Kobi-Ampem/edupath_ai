@@ -1,0 +1,13 @@
+fastapi
+uvicorn[standard]
+sqlalchemy
+alembic
+psycopg2-binary
+python-dotenv
+pydantic
+joblib
+scikit-learn
+openai
+python-jose[cryptography]   # for JWT later
+passlib[bcrypt]             # for password hashing
+databases                    # optional async DB helper
