@@ -63,10 +63,20 @@ export default function LoginForm() {
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1500));
 
+      // Set authentication state
+      localStorage.setItem("isAuthenticated", "true");
+      localStorage.setItem("userEmail", formData.email);
+      // Dispatch custom event for navbar update
+      window.dispatchEvent(new Event("authChange"));
+
       // Redirect based on the redirect parameter
       if (redirect === "assessment") {
         const careerParam = career ? `?career=${career}` : "";
         window.location.href = `/assessment${careerParam}`;
+      } else if (redirect === "chat") {
+        window.location.href = "/chat";
+      } else if (redirect === "profile") {
+        window.location.href = "/profile";
       } else {
         window.location.href = "/";
       }
@@ -92,6 +102,10 @@ export default function LoginForm() {
               <p className="text-[#16465B]/70">
                 {redirect === "assessment"
                   ? "Sign in to continue your career assessment"
+                  : redirect === "chat"
+                  ? "Sign in to chat with your career advisor"
+                  : redirect === "profile"
+                  ? "Sign in to view your profile"
                   : "Sign in to your EduPath AI account"}
               </p>
               {career && (
@@ -183,6 +197,10 @@ export default function LoginForm() {
                   </div>
                 ) : redirect === "assessment" ? (
                   "Sign In & Continue Assessment"
+                ) : redirect === "chat" ? (
+                  "Sign In & Open Chat"
+                ) : redirect === "profile" ? (
+                  "Sign In & View Profile"
                 ) : (
                   "Sign In"
                 )}

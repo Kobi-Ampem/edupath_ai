@@ -15,6 +15,19 @@ export default function Assessment() {
   const [currentQuiz, setCurrentQuiz] = useState<QuizType>(null);
   const [completedQuizzes, setCompletedQuizzes] = useState<QuizType[]>([]);
   const [quizResults, setQuizResults] = useState<Record<string, any>>({});
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+
+  // Check authentication on component mount
+  useEffect(() => {
+    const isAuthenticated = localStorage.getItem("isAuthenticated");
+    if (!isAuthenticated) {
+      // Not authenticated, redirect to login
+      const careerParam = career ? `&career=${career}` : "";
+      window.location.href = `/login?redirect=assessment${careerParam}`;
+    } else {
+      setIsCheckingAuth(false);
+    }
+  }, [career]);
 
   const quizzes = [
     {
@@ -47,12 +60,16 @@ export default function Assessment() {
   ];
 
   const handleQuizComplete = (quizType: QuizType, results: any) => {
-    setQuizResults((prev) => ({
-      ...prev,
+    const newResults = {
+      ...quizResults,
       [quizType!]: results,
-    }));
+    };
+    setQuizResults(newResults);
     setCompletedQuizzes((prev) => [...prev, quizType!]);
     setCurrentQuiz(null);
+
+    // Store results in localStorage for the recommendations page
+    localStorage.setItem("assessmentResults", JSON.stringify(newResults));
   };
 
   const getProgressPercentage = () => {
@@ -60,6 +77,26 @@ export default function Assessment() {
   };
 
   const allQuizzesCompleted = completedQuizzes.length === quizzes.length;
+
+  // Redirect to recommendations when all quizzes are completed
+  useEffect(() => {
+    if (allQuizzesCompleted && Object.keys(quizResults).length > 0) {
+      localStorage.setItem("assessmentResults", JSON.stringify(quizResults));
+      window.location.href = "/recommendations";
+    }
+  }, [allQuizzesCompleted, quizResults]);
+
+  // Show loading state while checking authentication
+  if (isCheckingAuth) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-white to-white/95 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-[#16465B] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-[#16465B]">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (currentQuiz) {
     return (
@@ -100,16 +137,17 @@ export default function Assessment() {
       <div className="min-h-screen bg-gradient-to-br from-white to-white/95">
         <Navbar />
         <div className="pt-24 pb-16 px-4 sm:px-6 lg:px-8">
-          <div className="max-w-4xl mx-auto">
-            <ResultsPage
-              results={quizResults}
-              career={career}
-              onRetake={() => {
-                setCompletedQuizzes([]);
-                setQuizResults({});
-                setCurrentQuiz(null);
-              }}
-            />
+          <div className="max-w-4xl mx-auto text-center">
+            <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
+              <span className="text-white text-2xl">✓</span>
+            </div>
+            <h2 className="text-3xl font-bold text-[#16465B] mb-4">
+              Assessment Complete!
+            </h2>
+            <p className="text-[#16465B]/70 mb-8">
+              Generating your personalized recommendations...
+            </p>
+            <div className="w-12 h-12 border-4 border-[#16465B] border-t-transparent rounded-full animate-spin mx-auto"></div>
           </div>
         </div>
       </div>
@@ -125,11 +163,11 @@ export default function Assessment() {
           {/* Header */}
           <div className="text-center mb-12">
             <h1 className="text-4xl md:text-5xl font-bold text-[#16465B] mb-6 pt-24">
-              Career Assessment
+              Course Assessment
             </h1>
             <p className="text-xl text-[#16465B]/80 max-w-3xl mx-auto mb-8">
               Complete our comprehensive assessment to discover your ideal
-              career path. Take all three quizzes to get personalized
+              course path. Take all three quizzes to get personalized
               recommendations.
             </p>
             {career && (
@@ -297,36 +335,6 @@ export default function Assessment() {
             </div>
           </div>
         </div>
-      </div>
-    </div>
-  );
-}
-
-// Results page component
-function ResultsPage({
-  results,
-  career,
-  onRetake,
-}: {
-  results: any;
-  career: string | null;
-  onRetake: () => void;
-}) {
-  return (
-    <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-8 shadow-lg border border-[#16465B]/20">
-      <div className="text-center">
-        <h2 className="text-3xl font-bold text-[#16465B] mb-4">
-          Assessment Complete!
-        </h2>
-        <p className="text-[#16465B]/70 mb-8">
-          Your personalized career recommendations are ready.
-        </p>
-        <button
-          onClick={onRetake}
-          className="px-8 py-3 bg-[#16465B] hover:bg-[#16465B]/90 text-white rounded-lg font-semibold transition-all duration-300 hover:scale-105"
-        >
-          Retake Assessment
-        </button>
       </div>
     </div>
   );

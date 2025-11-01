@@ -35,14 +35,16 @@ export default function Hero() {
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
             <button className="group relative px-8 py-4 bg-[#16465B] hover:bg-[#16465B]/90 text-white rounded-full font-semibold text-lg transition-all duration-300 hover:scale-105 shadow-lg">
-              <a href="/assessment">
+              <a href="/login?redirect=assessment">
                 <span className="relative z-10">Take Assessment Test</span>
               </a>
             </button>
 
             <button className="px-8 py-4 text-[#16465B]/90 hover:text-[#16465B] font-semibold text-lg transition-colors duration-300 hover:scale-105">
-              Watch Demo
-              <span className="ml-2">→</span>
+              <a href="/chat">
+                Chat with AI
+                <span className="ml-2">→</span>
+              </a>
             </button>
           </div>
         </div>

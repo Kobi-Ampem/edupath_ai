@@ -85,10 +85,22 @@ export default function SignUpForm() {
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 2000));
 
+      // Set authentication state and user data
+      localStorage.setItem("isAuthenticated", "true");
+      localStorage.setItem("userEmail", formData.email);
+      localStorage.setItem("userFirstName", formData.firstName);
+      localStorage.setItem("userLastName", formData.lastName);
+      // Dispatch custom event for navbar update
+      window.dispatchEvent(new Event("authChange"));
+
       // Redirect based on the redirect parameter
       if (redirect === "assessment") {
-        const careerParam = career ? `&career=${career}` : "";
-        window.location.href = `/assessment`;
+        const careerParam = career ? `?career=${career}` : "";
+        window.location.href = `/assessment${careerParam}`;
+      } else if (redirect === "chat") {
+        window.location.href = "/chat";
+      } else if (redirect === "profile") {
+        window.location.href = "/profile";
       } else {
         window.location.href = "/";
       }
@@ -104,7 +116,7 @@ export default function SignUpForm() {
       <Navbar />
 
       <div className="pt-24 pb-16 px-4 sm:px-6 lg:px-8 ">
-        <div className="max-w-md mx-auto">
+        <div className="max-w-md mx-auto ">
           <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-8 shadow-lg border border-[#16465B]/20 mt-24">
             {/* Header */}
             <div className="text-center mb-8">
@@ -114,6 +126,10 @@ export default function SignUpForm() {
               <p className="text-[#16465B]/70">
                 {redirect === "assessment"
                   ? "Sign up to start your personalized career assessment"
+                  : redirect === "chat"
+                  ? "Sign up to chat with your career advisor"
+                  : redirect === "profile"
+                  ? "Sign up to create your profile"
                   : "Join EduPath AI and discover your learning journey"}
               </p>
               {career && (
@@ -311,6 +327,10 @@ export default function SignUpForm() {
                   </div>
                 ) : redirect === "assessment" ? (
                   "Sign Up & Start Assessment"
+                ) : redirect === "chat" ? (
+                  "Sign Up & Open Chat"
+                ) : redirect === "profile" ? (
+                  "Sign Up & Create Profile"
                 ) : (
                   "Create Account"
                 )}
